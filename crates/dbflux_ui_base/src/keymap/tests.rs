@@ -2709,7 +2709,7 @@ fn alt_keys_jump_to_parts_and_manage_tabs_like_zed() {
         Some(Command::FocusSidebar)
     );
     assert_eq!(
-        keymap.resolve(ContextId::Editor, &alt("d")),
+        keymap.resolve(ContextId::Editor, &alt("r")),
         Some(Command::FocusResults)
     );
     assert_eq!(
@@ -2721,7 +2721,7 @@ fn alt_keys_jump_to_parts_and_manage_tabs_like_zed() {
         Some(Command::FocusEditor)
     );
     assert_eq!(
-        keymap.resolve(ContextId::Results, &alt("d")),
+        keymap.resolve(ContextId::Results, &alt("r")),
         Some(Command::FocusResults)
     );
     assert_eq!(

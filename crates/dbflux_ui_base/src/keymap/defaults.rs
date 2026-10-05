@@ -209,14 +209,13 @@ fn global_layer() -> KeymapLayer {
         Command::FocusBackgroundTasks,
     );
 
-    // Jump straight to a part with the same keys as my Zed setup: Alt+T the
-    // sidebar tree (Zed's `space f t`), Alt+E / Alt+O the editor, Alt+D the
-    // results (Zed's terminal panel). Each key always goes to its part; Alt+E
-    // is the way back to the editor.
+    // Jump straight to a part, the letter naming it: Alt+T the sidebar tree,
+    // Alt+E the editor (Alt+O too, as in my Zed setup), Alt+R the results.
+    // Each key always goes to its part; Alt+E is the way back to the editor.
     layer.bind(KeyChord::new("t", Modifiers::alt()), Command::FocusSidebar);
     layer.bind(KeyChord::new("e", Modifiers::alt()), Command::FocusEditor);
     layer.bind(KeyChord::new("o", Modifiers::alt()), Command::FocusEditor);
-    layer.bind(KeyChord::new("d", Modifiers::alt()), Command::FocusResults);
+    layer.bind(KeyChord::new("r", Modifiers::alt()), Command::FocusResults);
 
     // Tabs like in my terminals: Alt+N new, Alt+Q close, Alt+Shift+H / L
     // previous / next.
