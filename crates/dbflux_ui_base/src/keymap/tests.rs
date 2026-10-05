@@ -1843,7 +1843,8 @@ fn overrides_rebind_native_document_tree_keys_live(cx: &mut gpui::TestAppContext
         KeyChord::new("t", Modifiers::none()),
     )
     .with_predicate("DocumentTree && !Input");
-    let rebound = KeyChord::new("t", Modifiers::alt());
+    // Any chord with no default binding; Alt+T is taken (focus sidebar).
+    let rebound = KeyChord::new("y", Modifiers::alt());
 
     let mut overrides = KeymapOverrides::new();
     overrides.set(slot.clone(), Some(KeySequence::from(rebound.clone())));
@@ -1863,7 +1864,7 @@ fn overrides_rebind_native_document_tree_keys_live(cx: &mut gpui::TestAppContext
     window.simulate_keystrokes("t");
     assert_eq!(*cycles.borrow(), 0, "the old key no longer cycles the view");
 
-    window.simulate_keystrokes("alt-t");
+    window.simulate_keystrokes("alt-y");
     assert_eq!(*cycles.borrow(), 1, "the new key cycles the view");
 
     overrides.set(
@@ -2685,5 +2686,63 @@ fn alt_j_and_alt_k_step_lists_like_their_own_down_and_up() {
     assert_eq!(
         keymap.resolve(ContextId::Editor, &alt_k),
         Some(Command::FocusUp)
+    );
+}
+
+#[test]
+fn alt_keys_jump_to_parts_and_manage_tabs_like_zed() {
+    let keymap = default_keymap();
+    let alt = |k: &str| KeyChord::new(k, Modifiers::alt());
+    let alt_shift = |k: &str| {
+        KeyChord::new(
+            k,
+            Modifiers {
+                alt: true,
+                shift: true,
+                ..Modifiers::default()
+            },
+        )
+    };
+
+    assert_eq!(
+        keymap.resolve(ContextId::Editor, &alt("t")),
+        Some(Command::FocusSidebar)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Editor, &alt("d")),
+        Some(Command::FocusResults)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Results, &alt("e")),
+        Some(Command::FocusEditor)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Sidebar, &alt("o")),
+        Some(Command::FocusEditor)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Results, &alt("d")),
+        Some(Command::FocusEditor)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Sidebar, &alt("t")),
+        Some(Command::FocusEditor)
+    );
+
+    assert_eq!(
+        keymap.resolve(ContextId::Sidebar, &alt("n")),
+        Some(Command::NewQueryTab)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Editor, &alt("q")),
+        Some(Command::CloseCurrentTab)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Editor, &alt_shift("h")),
+        Some(Command::PrevTab)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Results, &alt_shift("l")),
+        Some(Command::NextTab)
     );
 }

@@ -73,6 +73,14 @@ fn leader(key: &str) -> KeySequence {
 /// the workspace, which hands it to the active document, and a document
 /// without the command ignores it. Inside a dialog the command goes to the
 /// dialog instead (Save confirms it) and never reaches the workspace.
+fn alt_shift() -> Modifiers {
+    Modifiers {
+        alt: true,
+        shift: true,
+        ..Modifiers::default()
+    }
+}
+
 /// Binds Alt+J / Alt+K to a list's down / up command, next to its own
 /// j/k or Ctrl+J/K, so lists can be stepped the same way as menus and pickers
 /// in Zed — and in the lists that have a text field, without leaving it.
@@ -200,6 +208,25 @@ fn global_layer() -> KeymapLayer {
         KeyChord::new("4", Modifiers::ctrl_shift()),
         Command::FocusBackgroundTasks,
     );
+
+    // Jump straight to a part with the same keys as my Zed setup: Alt+T the
+    // sidebar tree (Zed's `space f t`), Alt+E / Alt+O the editor, Alt+D the
+    // results (Zed's terminal panel). Pressing Alt+D or Alt+T again where it
+    // landed goes back to the editor (see the results and sidebar layers).
+    layer.bind(KeyChord::new("t", Modifiers::alt()), Command::FocusSidebar);
+    layer.bind(KeyChord::new("e", Modifiers::alt()), Command::FocusEditor);
+    layer.bind(KeyChord::new("o", Modifiers::alt()), Command::FocusEditor);
+    layer.bind(KeyChord::new("d", Modifiers::alt()), Command::FocusResults);
+
+    // Tabs like in my terminals: Alt+N new, Alt+Q close, Alt+Shift+H / L
+    // previous / next.
+    layer.bind(KeyChord::new("n", Modifiers::alt()), Command::NewQueryTab);
+    layer.bind(
+        KeyChord::new("q", Modifiers::alt()),
+        Command::CloseCurrentTab,
+    );
+    layer.bind(KeyChord::new("h", alt_shift()), Command::PrevTab);
+    layer.bind(KeyChord::new("l", alt_shift()), Command::NextTab);
 
     // Open audit viewer
     layer.bind(
@@ -330,6 +357,8 @@ fn sidebar_layer() -> KeymapLayer {
 
     // Panel navigation (Ctrl+hjkl)
     layer.bind(KeyChord::new("l", Modifiers::ctrl()), Command::FocusRight);
+    // Alt+T jumped here; pressing it again goes back to the editor.
+    layer.bind(KeyChord::new("t", Modifiers::alt()), Command::FocusEditor);
 
     // Tree collapse/expand
     layer.bind(KeyChord::new("h", Modifiers::none()), Command::ColumnLeft);
@@ -560,6 +589,8 @@ fn results_layer() -> KeymapLayer {
     layer.bind(KeyChord::new("j", Modifiers::ctrl()), Command::FocusToolbar);
     layer.bind(KeyChord::new("k", Modifiers::ctrl()), Command::FocusUp);
     layer.bind(KeyChord::new("l", Modifiers::ctrl()), Command::FocusRight);
+    // Alt+D jumped here; pressing it again goes back to the editor.
+    layer.bind(KeyChord::new("d", Modifiers::alt()), Command::FocusEditor);
 
     // Table navigation
     layer.bind(KeyChord::new("j", Modifiers::none()), Command::SelectNext);
