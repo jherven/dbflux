@@ -211,8 +211,8 @@ fn global_layer() -> KeymapLayer {
 
     // Jump straight to a part with the same keys as my Zed setup: Alt+T the
     // sidebar tree (Zed's `space f t`), Alt+E / Alt+O the editor, Alt+D the
-    // results (Zed's terminal panel). Pressing Alt+D or Alt+T again where it
-    // landed goes back to the editor (see the results and sidebar layers).
+    // results (Zed's terminal panel). Each key always goes to its part; Alt+E
+    // is the way back to the editor.
     layer.bind(KeyChord::new("t", Modifiers::alt()), Command::FocusSidebar);
     layer.bind(KeyChord::new("e", Modifiers::alt()), Command::FocusEditor);
     layer.bind(KeyChord::new("o", Modifiers::alt()), Command::FocusEditor);
@@ -357,8 +357,6 @@ fn sidebar_layer() -> KeymapLayer {
 
     // Panel navigation (Ctrl+hjkl)
     layer.bind(KeyChord::new("l", Modifiers::ctrl()), Command::FocusRight);
-    // Alt+T jumped here; pressing it again goes back to the editor.
-    layer.bind(KeyChord::new("t", Modifiers::alt()), Command::FocusEditor);
 
     // Tree collapse/expand
     layer.bind(KeyChord::new("h", Modifiers::none()), Command::ColumnLeft);
@@ -589,8 +587,6 @@ fn results_layer() -> KeymapLayer {
     layer.bind(KeyChord::new("j", Modifiers::ctrl()), Command::FocusToolbar);
     layer.bind(KeyChord::new("k", Modifiers::ctrl()), Command::FocusUp);
     layer.bind(KeyChord::new("l", Modifiers::ctrl()), Command::FocusRight);
-    // Alt+D jumped here; pressing it again goes back to the editor.
-    layer.bind(KeyChord::new("d", Modifiers::alt()), Command::FocusEditor);
 
     // Table navigation
     layer.bind(KeyChord::new("j", Modifiers::none()), Command::SelectNext);

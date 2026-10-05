@@ -2722,11 +2722,11 @@ fn alt_keys_jump_to_parts_and_manage_tabs_like_zed() {
     );
     assert_eq!(
         keymap.resolve(ContextId::Results, &alt("d")),
-        Some(Command::FocusEditor)
+        Some(Command::FocusResults)
     );
     assert_eq!(
         keymap.resolve(ContextId::Sidebar, &alt("t")),
-        Some(Command::FocusEditor)
+        Some(Command::FocusSidebar)
     );
 
     assert_eq!(
