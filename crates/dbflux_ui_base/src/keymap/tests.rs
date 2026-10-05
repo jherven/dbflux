@@ -2646,3 +2646,44 @@ fn run_command_for_returns_the_bound_action(cx: &mut gpui::TestAppContext) {
         "the rebound chord comes from the user's binding"
     );
 }
+
+#[test]
+fn alt_j_and_alt_k_step_lists_like_their_own_down_and_up() {
+    let keymap = default_keymap();
+    let alt_j = KeyChord::new("j", Modifiers::alt());
+    let alt_k = KeyChord::new("k", Modifiers::alt());
+
+    for context in [
+        ContextId::CommandPalette,
+        ContextId::HistoryModal,
+        ContextId::Dropdown,
+        ContextId::ContextBar,
+    ] {
+        assert_eq!(
+            keymap.resolve(context, &alt_j),
+            Some(Command::SelectNext),
+            "{context:?}"
+        );
+        assert_eq!(
+            keymap.resolve(context, &alt_k),
+            Some(Command::SelectPrev),
+            "{context:?}"
+        );
+    }
+    assert_eq!(
+        keymap.resolve(ContextId::ContextMenu, &alt_j),
+        Some(Command::MenuDown)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::ContextMenu, &alt_k),
+        Some(Command::MenuUp)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Editor, &alt_j),
+        Some(Command::FocusDown)
+    );
+    assert_eq!(
+        keymap.resolve(ContextId::Editor, &alt_k),
+        Some(Command::FocusUp)
+    );
+}

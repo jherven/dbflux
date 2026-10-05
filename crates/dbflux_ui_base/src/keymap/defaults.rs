@@ -73,6 +73,14 @@ fn leader(key: &str) -> KeySequence {
 /// the workspace, which hands it to the active document, and a document
 /// without the command ignores it. Inside a dialog the command goes to the
 /// dialog instead (Save confirms it) and never reaches the workspace.
+/// Binds Alt+J / Alt+K to a list's down / up command, next to its own
+/// j/k or Ctrl+J/K, so lists can be stepped the same way as menus and pickers
+/// in Zed — and in the lists that have a text field, without leaving it.
+fn bind_alt_jk(layer: &mut KeymapLayer, down: Command, up: Command) {
+    layer.bind(KeyChord::new("j", Modifiers::alt()), down);
+    layer.bind(KeyChord::new("k", Modifiers::alt()), up);
+}
+
 fn vim_normal_layer() -> KeymapLayer {
     let mut layer = KeymapLayer::new(ContextId::VimNormal);
 
@@ -421,6 +429,9 @@ fn editor_layer() -> KeymapLayer {
     layer.bind(KeyChord::new("h", Modifiers::ctrl()), Command::FocusLeft);
     layer.bind(KeyChord::new("j", Modifiers::ctrl()), Command::FocusDown);
     layer.bind(KeyChord::new("k", Modifiers::ctrl()), Command::FocusUp);
+    // Like Ctrl+J/K: steps an open completion or code-action menu, otherwise
+    // moves focus to the panel below / above.
+    bind_alt_jk(&mut layer, Command::FocusDown, Command::FocusUp);
 
     // Enter focuses the SQL input
     layer.bind(KeyChord::new("enter", Modifiers::none()), Command::Execute);
@@ -464,6 +475,7 @@ fn event_streams_picker_layer() -> KeymapLayer {
     );
     layer.bind(KeyChord::new("k", Modifiers::none()), Command::SelectPrev);
     layer.bind(KeyChord::new("up", Modifiers::none()), Command::SelectPrev);
+    bind_alt_jk(&mut layer, Command::SelectNext, Command::SelectPrev);
 
     layer.bind(KeyChord::new("g", Modifiers::none()), Command::SelectFirst);
     layer.bind(
@@ -490,6 +502,7 @@ fn history_modal_layer() -> KeymapLayer {
     );
     layer.bind(KeyChord::new("k", Modifiers::ctrl()), Command::SelectPrev);
     layer.bind(KeyChord::new("up", Modifiers::none()), Command::SelectPrev);
+    bind_alt_jk(&mut layer, Command::SelectNext, Command::SelectPrev);
 
     layer.bind(KeyChord::new("enter", Modifiers::none()), Command::Execute);
     layer.bind(KeyChord::new("escape", Modifiers::none()), Command::Cancel);
@@ -696,6 +709,7 @@ fn context_menu_layer() -> KeymapLayer {
     layer.bind(KeyChord::new("down", Modifiers::none()), Command::MenuDown);
     layer.bind(KeyChord::new("k", Modifiers::none()), Command::MenuUp);
     layer.bind(KeyChord::new("up", Modifiers::none()), Command::MenuUp);
+    bind_alt_jk(&mut layer, Command::MenuDown, Command::MenuUp);
 
     // Select / Enter submenu
     layer.bind(
@@ -858,6 +872,7 @@ fn command_palette_layer() -> KeymapLayer {
     layer.bind(KeyChord::new("up", Modifiers::none()), Command::SelectPrev);
     layer.bind(KeyChord::new("j", Modifiers::ctrl()), Command::SelectNext);
     layer.bind(KeyChord::new("k", Modifiers::ctrl()), Command::SelectPrev);
+    bind_alt_jk(&mut layer, Command::SelectNext, Command::SelectPrev);
 
     layer.bind(KeyChord::new("enter", Modifiers::none()), Command::Execute);
     // Opens the chosen table or collection in another tab instead of the
@@ -1090,6 +1105,7 @@ fn context_bar_layer() -> KeymapLayer {
     );
     layer.bind(KeyChord::new("k", Modifiers::none()), Command::SelectPrev);
     layer.bind(KeyChord::new("up", Modifiers::none()), Command::SelectPrev);
+    bind_alt_jk(&mut layer, Command::SelectNext, Command::SelectPrev);
 
     // Open/select dropdown
     layer.bind(KeyChord::new("enter", Modifiers::none()), Command::Execute);
@@ -1373,6 +1389,7 @@ fn dropdown_layer() -> KeymapLayer {
 
     layer.bind(KeyChord::new("k", Modifiers::none()), Command::SelectPrev);
     layer.bind(KeyChord::new("up", Modifiers::none()), Command::SelectPrev);
+    bind_alt_jk(&mut layer, Command::SelectNext, Command::SelectPrev);
 
     layer.bind(KeyChord::new("enter", Modifiers::none()), Command::Execute);
     // Opens a closed dropdown, confirms an open one, and toggles the
@@ -1541,6 +1558,16 @@ fn input_layer() -> KeymapLayer {
     );
     layer.bind_with_predicate(
         KeyChord::new("k", Modifiers::ctrl()),
+        Command::SelectPrev,
+        "Input && !CodeEditor",
+    );
+    layer.bind_with_predicate(
+        KeyChord::new("j", Modifiers::alt()),
+        Command::SelectNext,
+        "Input && !CodeEditor",
+    );
+    layer.bind_with_predicate(
+        KeyChord::new("k", Modifiers::alt()),
         Command::SelectPrev,
         "Input && !CodeEditor",
     );
@@ -2007,6 +2034,7 @@ fn add_panel_picker_layer() -> KeymapLayer {
 
     layer.bind(KeyChord::new("j", Modifiers::none()), Command::SelectNext);
     layer.bind(KeyChord::new("k", Modifiers::none()), Command::SelectPrev);
+    bind_alt_jk(&mut layer, Command::SelectNext, Command::SelectPrev);
     layer.bind(KeyChord::new("g", Modifiers::none()), Command::SelectFirst);
     layer.bind(KeyChord::new("g", Modifiers::shift()), Command::SelectLast);
     layer.bind(KeyChord::new("h", Modifiers::none()), Command::ColumnLeft);
