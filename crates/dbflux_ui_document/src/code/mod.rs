@@ -1743,6 +1743,15 @@ impl CodeDocument {
             return true;
         }
 
+        // Focusing the editor lands on its text from any part of the document:
+        // the results, the context bar or the text itself. Stepping up from the
+        // results is not enough, because from the text that step goes on into
+        // the context bar.
+        if cmd == Command::FocusEditor {
+            self.exit_context_bar(window, cx);
+            return true;
+        }
+
         // When focused on results, delegate to active DataGridPanel
         if self.focus_mode == SqlQueryFocus::Results
             && let Some(grid) = self.active_result_grid()

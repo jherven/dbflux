@@ -45,7 +45,11 @@ impl Workspace {
             Command::FocusEditor => {
                 self.set_focus(FocusTarget::Document, window, cx);
                 self.tab_manager.update(cx, |mgr, cx| {
-                    mgr.dispatch_active(Command::FocusUp, window, cx);
+                    // A code document puts focus on its text itself; other
+                    // documents keep the step up out of their results.
+                    if !mgr.dispatch_active(Command::FocusEditor, window, cx) {
+                        mgr.dispatch_active(Command::FocusUp, window, cx);
+                    }
                 });
                 Some(true)
             }
